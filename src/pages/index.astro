@@ -1,0 +1,79 @@
+---
+import { getCollection } from 'astro:content';
+import ReleaseEntry, { type EntryState } from '../components/ReleaseEntry.astro';
+import NewsletterSignup from '../components/NewsletterSignup.astro';
+import Gohan from '../components/Gohan.astro';
+import '../styles/global.css';
+
+const entries = (await getCollection('releases')).sort(
+  (a, b) => a.data.date.getTime() - b.data.date.getTime()
+);
+
+const now = Date.now();
+const TWO_WEEKS = 14 * 24 * 60 * 60 * 1000;
+
+const isReleased = (e: (typeof entries)[number]) =>
+  Boolean(e.data.url) && e.data.title !== '???';
+
+// First unreleased entry is the "next drop".
+const nextEntry = entries.find((e) => !isReleased(e));
+
+const items = entries.map((e) => {
+  let state: EntryState;
+  if (isReleased(e)) {
+    state = 'released';
+  } else if (e === nextEntry) {
+    state = 'next';
+  } else {
+    state = 'upcoming';
+  }
+
+  let gohanPose: 'point' | 'sleep' | 'celebrate' | null = null;
+  if (state === 'next') {
+    gohanPose = 'point';
+  } else if (state === 'upcoming' && nextEntry && e.data.date.getTime() - nextEntry.data.date.getTime() > 2 * TWO_WEEKS) {
+    gohanPose = 'sleep';
+  } else if (state === 'released') {
+    gohanPose = 'celebrate';
+  }
+
+  return { ...e.data, state, gohanPose };
+});
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self'; form-action https://app.kit.com; base-uri 'none'; object-src 'none'"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="The terragohan harvest calendar — something new every two weeks." />
+    <title>terragohan — harvest calendar</title>
+    <script is:inline src="/scripts/theme.js"></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <Gohan pose="wave" size={96} class="header-gohan" />
+      <h1 class="wordmark">TERRAGOHAN</h1>
+      <p class="tagline">something new every two weeks</p>
+    </header>
+
+    <main class="calendar">
+      <NewsletterSignup />
+      {items.map((item) => <ReleaseEntry {...item} />)}
+    </main>
+
+    <footer class="site-footer">
+      <Gohan pose="wave" size={64} />
+      <p>harvested with love by terragohan</p>
+      <p>
+        <a href="/terms" class="to-top">terms & attribution</a> ·
+        <a href="#top" class="to-top">back to top &uarr;</a>
+      </p>
+    </footer>
+
+    <script is:inline src="/scripts/countdown.js"></script>
+  </body>
+</html>

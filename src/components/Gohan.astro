@@ -1,0 +1,118 @@
+---
+/**
+ * Gohan — the terragohan mascot. Original pixel art referencing Gohan from
+ * Dragon Ball Z (spiky black hair, orange gi, blue belt), rendered as inline
+ * SVG on a 20x20 grid so it recolors with the day/dusk/night CSS variables.
+ * Fan art for a non-commercial fan project — see /terms for attribution.
+ *
+ * Poses: wave | point | sleep | celebrate
+ */
+interface Props {
+  pose?: 'wave' | 'point' | 'sleep' | 'celebrate';
+  size?: number;
+  class?: string;
+}
+const { pose = 'wave', size = 72, class: className } = Astro.props;
+
+const COLORS: Record<string, string> = {
+  k: 'var(--ink)', // outline
+  b: 'var(--ink)', // eyes / mouth
+  h: 'var(--hair)', // spiky black hair
+  s: 'var(--skin)', // face / hands
+  o: 'var(--gi)', // orange gi
+  u: 'var(--belt)', // blue belt
+  p: 'var(--salmon)', // cheeks / confetti
+  e: 'var(--egg)', // confetti
+  g: 'var(--nori-light)', // confetti
+};
+
+// Body grid, 16 chars wide, drawn at offset x=2, y=1 (canvas is 20x20).
+const AWAKE_FACE = [
+  '................',
+  '....h..hh..h....', // spike tips
+  '...hhhhhhhhhh...',
+  '..hhhhhhhhhhhh..',
+  '..hhhhhhhhhhhh..',
+  '.khhhhhhhhhhhhk.',
+  '.khsshhhhhhsshk.', // hairline, widow's peak
+  '.khsssshhsssshk.',
+  '.khsbbssssbbshk.', // eyes
+  '.kpsbbssssbbspk.', // cheeks
+  '.kpssssbbsssspk.', // mouth
+  '.kssssssssssssk.', // chin
+  '.kooooooooooook.', // gi
+  '.koouuuuuuuuook.', // blue belt
+  '.kooooooooooook.',
+  '.kooooooooooook.',
+  '.kkkkkkkkkkkkkk.',
+  '................',
+];
+
+const SLEEP_FACE = AWAKE_FACE.map((row, i) => {
+  if (i === 8) return '.khsssssssssshk.'; // no open eyes
+  if (i === 9) return '.kpkksssssskkpk.'; // closed-eye lines + cheeks
+  if (i === 10) return '.kpssssbbsssspk.'; // tiny mouth
+  return row;
+});
+
+const body = pose === 'sleep' ? SLEEP_FACE : AWAKE_FACE;
+
+// Extra pixels per pose, in absolute canvas coords: [x, y, colorKey]
+const extras: Record<string, [number, number, string][]> = {
+  // right mitten raised
+  wave: [
+    [17, 4, 'k'], [18, 4, 'k'], [19, 4, 'k'],
+    [17, 5, 'k'], [18, 5, 's'], [19, 5, 'k'],
+    [17, 6, 'k'], [18, 6, 'k'], [19, 6, 'k'],
+  ],
+  // right mitten extended horizontally
+  point: [
+    [17, 9, 'k'], [18, 9, 'k'], [19, 9, 'k'],
+    [17, 10, 'k'], [18, 10, 's'], [19, 10, 'k'],
+    [17, 11, 'k'], [18, 11, 'k'], [19, 11, 'k'],
+  ],
+  celebrate: [
+    // both mittens up
+    [17, 4, 'k'], [18, 4, 'k'], [19, 4, 'k'],
+    [17, 5, 'k'], [18, 5, 's'], [19, 5, 'k'],
+    [17, 6, 'k'], [18, 6, 'k'], [19, 6, 'k'],
+    [0, 4, 'k'], [1, 4, 'k'], [2, 4, 'k'],
+    [0, 5, 'k'], [1, 5, 's'], [2, 5, 'k'],
+    [0, 6, 'k'], [1, 6, 'k'], [2, 6, 'k'],
+    // confetti
+    [4, 1, 'p'], [9, 0, 'e'], [14, 1, 'p'], [6, 2, 'g'], [12, 2, 'e'],
+  ],
+  sleep: [
+    // two ascending pixel "z"s
+    [14, 4, 'k'], [15, 4, 'k'], [16, 4, 'k'],
+    [15, 5, 'k'],
+    [14, 6, 'k'], [15, 6, 'k'], [16, 6, 'k'],
+    [17, 1, 'k'], [18, 1, 'k'], [19, 1, 'k'],
+    [18, 2, 'k'],
+    [17, 3, 'k'], [18, 3, 'k'], [19, 3, 'k'],
+  ],
+};
+
+const rects: { x: number; y: number; fill: string }[] = [];
+body.forEach((row, y) => {
+  [...row].forEach((ch, x) => {
+    const fill = COLORS[ch];
+    if (fill) rects.push({ x: x + 2, y: y + 1, fill });
+  });
+});
+for (const [x, y, ch] of extras[pose] ?? []) {
+  rects.push({ x, y, fill: COLORS[ch] });
+}
+---
+
+<svg
+  class={className}
+  width={size}
+  height={size}
+  viewBox="0 0 20 20"
+  shape-rendering="crispEdges"
+  role="img"
+  aria-label={`Gohan mascot (${pose})`}
+>
+  {rects.map(({ x, y, fill }) => <rect x={x} y={y} width="1" height="1" fill={fill} />)}
+</svg>

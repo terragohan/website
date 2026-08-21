@@ -1,0 +1,12 @@
+---
+/**
+ * Countdown — renders a ticking <span class="countdown"> toward `date`.
+ * The shared tick script lives once in index.astro; this is markup only.
+ */
+interface Props {
+  date: Date;
+}
+const { date } = Astro.props;
+---
+
+<span class="countdown" data-date={date.toISOString()}>-- : -- : -- : --</span>

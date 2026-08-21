@@ -1,0 +1,64 @@
+---
+import Gohan from './Gohan.astro';
+import Countdown from './Countdown.astro';
+
+export type EntryState = 'released' | 'next' | 'upcoming';
+
+interface Props {
+  date: Date;
+  title?: string;
+  description?: string;
+  url?: string;
+  state: EntryState;
+  gohanPose?: 'point' | 'sleep' | 'celebrate' | null;
+}
+
+const { date, title, description, url, state, gohanPose = null } = Astro.props;
+
+const dateLabel = date
+  .toLocaleDateString('en-US', {
+    weekday: 'short',
+    year: 'numeric',
+    month: 'short',
+    day: '2-digit',
+    timeZone: 'UTC',
+  })
+  .toUpperCase();
+---
+
+<article class:list={['entry', `entry--${state}`]}>
+  <div class="entry-date">{dateLabel}</div>
+
+  {
+    state === 'released' ? (
+      <div class="entry-body">
+        <h2 class="entry-title">{title}</h2>
+        {description && <p class="entry-desc">{description}</p>}
+        {url && (
+          <a class="entry-link" href={url} target="_blank" rel="noopener">
+            VISIT &rarr;
+          </a>
+        )}
+        <span class="stamp" aria-hidden="true">
+          RELEASED
+        </span>
+      </div>
+    ) : (
+      <div class="entry-body">
+        <h2 class="entry-title entry-title--mystery">???</h2>
+        <p class="entry-desc">something new is growing&hellip;</p>
+        <div class="countdown-wrap">
+          <span class="countdown-label">T-MINUS</span>
+          <Countdown date={date} />
+        </div>
+        {state === 'next' && (
+          <span class="badge" aria-hidden="true">
+            NEXT DROP
+          </span>
+        )}
+      </div>
+    )
+  }
+
+  {gohanPose && <Gohan pose={gohanPose} size={64} class="entry-gohan" />}
+</article>

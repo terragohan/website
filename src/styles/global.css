@@ -1,0 +1,441 @@
+/* terragohan — retro pixel harvest calendar */
+
+@font-face {
+  font-family: 'Press Start 2P';
+  src: url('/fonts/press-start-2p.woff2') format('woff2');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'DotGothic16';
+  src: url('/fonts/dot-gothic-16.woff2') format('woff2');
+  font-display: swap;
+}
+
+/* ---------- palettes (living page: day / dusk / night) ---------- */
+
+:root,
+:root[data-theme='day'] {
+  --bg: #f7edd8;
+  --card: #fff8ea;
+  --ink: #3e2f23;
+  --rice: #fffdf4;
+  --nori: #2e5e3f;
+  --nori-light: #5ba36f;
+  --salmon: #e2603f;
+  --egg: #f2b134;
+  --muted: #8a7561;
+  --hair: #1b1b26;
+  --skin: #ffd9b3;
+  --gi: #f07818;
+  --belt: #2b50c8;
+}
+
+:root[data-theme='dusk'] {
+  --bg: #f2cf9a;
+  --card: #ffe9c4;
+  --ink: #4a2c20;
+  --rice: #fff6e2;
+  --nori: #2e5e3f;
+  --nori-light: #5ba36f;
+  --salmon: #d64f2e;
+  --egg: #e89a1e;
+  --muted: #96704f;
+  --hair: #1b1b26;
+  --skin: #f7cfa6;
+  --gi: #e56f12;
+  --belt: #2446b4;
+}
+
+:root[data-theme='night'] {
+  --bg: #1c2340;
+  --card: #262f52;
+  --ink: #f0e6d2;
+  --rice: #f7f1e0;
+  --nori: #5ba36f;
+  --nori-light: #7fc490;
+  --salmon: #ff9d7a;
+  --egg: #ffd97a;
+  --muted: #9aa3c0;
+  --hair: #0d0d16;
+  --skin: #f0c49a;
+  --gi: #ff9550;
+  --belt: #6d8dff;
+}
+
+/* ---------- base ---------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'DotGothic16', monospace;
+  font-size: 1.15rem;
+  line-height: 1.5;
+  /* subtle pixel dither in the background */
+  background-image: radial-gradient(color-mix(in srgb, var(--ink) 7%, transparent) 1px, transparent 1px);
+  background-size: 8px 8px;
+  transition: background-color 0.6s ease;
+}
+
+/* ---------- header / footer ---------- */
+
+.site-header {
+  text-align: center;
+  padding: 3rem 1rem 2rem;
+}
+
+.header-gohan {
+  display: block;
+  margin: 0 auto 0.5rem;
+}
+
+.wordmark {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(1.4rem, 5vw, 2.4rem);
+  margin: 0.5rem 0;
+  letter-spacing: 0.05em;
+  text-shadow: 3px 3px 0 var(--egg);
+}
+
+.tagline {
+  color: var(--muted);
+  margin: 0;
+}
+
+.site-footer {
+  text-align: center;
+  padding: 2.5rem 1rem 3rem;
+  color: var(--muted);
+}
+
+.site-footer svg {
+  display: block;
+  margin: 0 auto 0.75rem;
+}
+
+.to-top {
+  color: var(--salmon);
+}
+
+/* ---------- calendar list ---------- */
+
+.calendar {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+/* ---------- entry cards ---------- */
+
+.entry {
+  position: relative;
+  background: var(--card);
+  border: 3px solid var(--ink);
+  box-shadow: 5px 5px 0 var(--ink);
+  padding: 1.25rem 1.5rem 1.5rem;
+}
+
+/* timetable dashes between cards */
+.entry:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: 1.5rem;
+  right: 1.5rem;
+  bottom: -1.4rem;
+  border-bottom: 3px dashed color-mix(in srgb, var(--ink) 35%, transparent);
+}
+
+.entry-date {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.7rem;
+  color: var(--muted);
+  margin-bottom: 0.9rem;
+}
+
+.entry--next .entry-date {
+  color: var(--salmon);
+}
+
+.entry-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 1.05rem;
+  margin: 0 0 0.6rem;
+  line-height: 1.6;
+}
+
+.entry-title--mystery {
+  color: var(--egg);
+  text-shadow: 2px 2px 0 var(--ink);
+  font-size: 1.4rem;
+}
+
+.entry-desc {
+  margin: 0 0 0.9rem;
+  max-width: 32rem;
+}
+
+.entry--released .entry-title {
+  color: var(--nori);
+}
+
+:root[data-theme='night'] .entry--released .entry-title {
+  color: var(--nori-light);
+}
+
+/* link button */
+.entry-link {
+  display: inline-block;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.65rem;
+  color: var(--card);
+  background: var(--nori);
+  border: 3px solid var(--ink);
+  box-shadow: 3px 3px 0 var(--ink);
+  padding: 0.6rem 0.9rem;
+  text-decoration: none;
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+
+:root[data-theme='night'] .entry-link {
+  color: #1c2340;
+}
+
+.entry-link:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--ink);
+  background: var(--salmon);
+}
+
+/* countdown */
+.countdown-wrap {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.countdown-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.55rem;
+  color: var(--muted);
+}
+
+.countdown {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.95rem;
+  color: var(--salmon);
+}
+
+.countdown--today {
+  color: var(--nori);
+  animation: blink 1s steps(2, start) infinite;
+}
+
+:root[data-theme='night'] .countdown--today {
+  color: var(--nori-light);
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* badges & stamps */
+.badge {
+  position: absolute;
+  top: -0.85rem;
+  right: 1rem;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.55rem;
+  background: var(--salmon);
+  color: var(--card);
+  border: 3px solid var(--ink);
+  box-shadow: 3px 3px 0 var(--ink);
+  padding: 0.4rem 0.6rem;
+  transform: rotate(2deg);
+}
+
+.stamp {
+  position: absolute;
+  top: 0.9rem;
+  right: 1rem;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.55rem;
+  color: var(--nori);
+  border: 3px solid var(--nori);
+  padding: 0.35rem 0.55rem;
+  transform: rotate(-6deg);
+  opacity: 0.85;
+}
+
+:root[data-theme='night'] .stamp {
+  color: var(--nori-light);
+  border-color: var(--nori-light);
+}
+
+/* gohan popping up from behind the card corner */
+.entry-gohan {
+  position: absolute;
+  right: -0.5rem;
+  bottom: -1rem;
+  pointer-events: none;
+}
+
+/* highlighted next-drop card */
+.entry--next {
+  border-color: var(--salmon);
+  box-shadow: 5px 5px 0 var(--salmon);
+  background: color-mix(in srgb, var(--card) 85%, var(--egg));
+}
+
+/* ---------- terms page ---------- */
+
+.terms {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 3rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.terms .wordmark {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.terms-back {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+/* ---------- newsletter signup ---------- */
+
+.newsletter {
+  position: relative;
+  background: var(--card);
+  border: 3px solid var(--ink);
+  box-shadow: 5px 5px 0 var(--ink);
+  padding: 1.25rem 1.5rem 1.5rem;
+  text-align: center;
+}
+
+/* timetable dashes below, like the entry cards */
+.newsletter::after {
+  content: '';
+  position: absolute;
+  left: 1.5rem;
+  right: 1.5rem;
+  bottom: -1.4rem;
+  border-bottom: 3px dashed color-mix(in srgb, var(--ink) 35%, transparent);
+}
+
+.newsletter-gohan {
+  position: absolute;
+  right: -0.5rem;
+  bottom: -1rem;
+  pointer-events: none;
+}
+
+.newsletter-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.95rem;
+  margin: 0 0 0.5rem;
+  color: var(--salmon);
+  text-shadow: 2px 2px 0 var(--ink);
+}
+
+.newsletter-desc {
+  margin: 0 0 1rem;
+  color: var(--muted);
+}
+
+.newsletter-form {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.newsletter-input {
+  font-family: 'DotGothic16', monospace;
+  font-size: 1.05rem;
+  color: var(--ink);
+  background: var(--bg);
+  border: 3px solid var(--ink);
+  box-shadow: inset 3px 3px 0 color-mix(in srgb, var(--ink) 15%, transparent);
+  padding: 0.55rem 0.75rem;
+  min-width: 16rem;
+  outline: none;
+}
+
+.newsletter-input:focus {
+  border-color: var(--salmon);
+}
+
+.newsletter-button {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.65rem;
+  color: var(--card);
+  background: var(--salmon);
+  border: 3px solid var(--ink);
+  box-shadow: 3px 3px 0 var(--ink);
+  padding: 0.6rem 0.9rem;
+  cursor: pointer;
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+
+:root[data-theme='night'] .newsletter-button {
+  color: #1c2340;
+}
+
+.newsletter-button:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--ink);
+  background: var(--nori);
+}
+
+/* ---------- responsive ---------- */
+
+@media (max-width: 480px) {
+  .entry {
+    padding: 1rem 1.1rem 1.25rem;
+  }
+
+  .entry-title {
+    font-size: 0.85rem;
+  }
+
+  .countdown {
+    font-size: 0.75rem;
+  }
+
+  .stamp,
+  .badge {
+    position: static;
+    display: inline-block;
+    margin-top: 0.5rem;
+    transform: rotate(-3deg);
+  }
+
+  .entry-gohan {
+    right: 0;
+    bottom: -0.9rem;
+    width: 48px;
+    height: 48px;
+  }
+}
