@@ -18,6 +18,7 @@ const FORM_ACTION = 'https://buttondown.com/api/emails/embed-subscribe/terragoha
   <h2 class="newsletter-title">JOIN THE HARVEST LIST</h2>
   <p class="newsletter-desc">get an email every time a new project drops</p>
   <form class="newsletter-form" action={FORM_ACTION} method="post">
+    <input type="hidden" value="1" name="embed" />
     <input
       class="newsletter-input"
       type="email"
@@ -28,4 +29,6 @@ const FORM_ACTION = 'https://buttondown.com/api/emails/embed-subscribe/terragoha
     />
     <button class="newsletter-button" type="submit">SIGN UP</button>
   </form>
+  <p class="newsletter-status" role="status" aria-live="polite"></p>
+  <script is:inline src="/scripts/signup.js"></script>
 </section>

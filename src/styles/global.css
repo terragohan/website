@@ -409,6 +409,30 @@ body {
   background: var(--nori);
 }
 
+.newsletter-button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.newsletter-status {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.6rem;
+  margin: 0.9rem 0 0;
+  min-height: 0.9em;
+}
+
+.newsletter-status--ok {
+  color: var(--nori);
+}
+
+:root[data-theme='night'] .newsletter-status--ok {
+  color: var(--nori-light);
+}
+
+.newsletter-status--err {
+  color: var(--salmon);
+}
+
 /* ---------- responsive ---------- */
 
 @media (max-width: 480px) {
