@@ -2,15 +2,15 @@
 import Gohan from './Gohan.astro';
 
 /**
- * Newsletter signup — Kit (kit.com, formerly ConvertKit). Free for up to
- * 10,000 subscribers; Kit earns money from paid tiers and commerce tools,
- * so a free newsletter like ours never pays.
+ * Newsletter signup — Buttondown (buttondown.com). Developer-friendly:
+ * raw HTML form endpoint (no API key needed), full REST API for managing
+ * subscribers and drafts programmatically, Markdown-native editor.
+ * Free for up to 100 subscribers.
  *
- * SETUP: the form action below is the terragohan Kit form (found via the
- * JS embed snippet). If you ever recreate the form in Kit, grab the new
- * action URL from the form's HTML embed settings.
+ * SETUP: create the newsletter at buttondown.com, then set the username
+ * in the action URL below (https://buttondown.com/api/emails/embed-subscribe/<username>).
  */
-const FORM_ACTION = 'https://app.kit.com/forms/9830350/subscriptions';
+const FORM_ACTION = 'https://buttondown.com/api/emails/embed-subscribe/terragohan';
 ---
 
 <section class="newsletter">
@@ -21,7 +21,7 @@ const FORM_ACTION = 'https://app.kit.com/forms/9830350/subscriptions';
     <input
       class="newsletter-input"
       type="email"
-      name="email_address"
+      name="email"
       placeholder="you@example.com"
       autocomplete="email"
       required
