@@ -1,7 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
 import ReleaseEntry, { type EntryState } from '../components/ReleaseEntry.astro';
-import NewsletterSignup from '../components/NewsletterSignup.astro';
 import Gohan from '../components/Gohan.astro';
 import '../styles/global.css';
 
@@ -46,13 +45,14 @@ const items = entries.map((e) => {
     <meta charset="utf-8" />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self'; form-action https://buttondown.com; connect-src https://buttondown.com; base-uri 'none'; object-src 'none'"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self'; base-uri 'none'; object-src 'none'"
     />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="The terragohan harvest calendar — something new every two weeks." />
     <link rel="icon" type="image/svg+xml" href="/logo.svg" />
     <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="alternate" type="application/rss+xml" title="terragohan — harvest" href="/rss.xml" />
     <title>terragohan — harvest calendar</title>
     <script is:inline src="/scripts/theme.js"></script>
   </head>
@@ -64,7 +64,6 @@ const items = entries.map((e) => {
     </header>
 
     <main class="calendar">
-      <NewsletterSignup />
       {items.map((item) => <ReleaseEntry {...item} />)}
     </main>
 
