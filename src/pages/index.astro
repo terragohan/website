@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import ReleaseEntry, { type EntryState } from '../components/ReleaseEntry.astro';
 import Gohan from '../components/Gohan.astro';
+import Seo from '../components/Seo.astro';
 import '../styles/global.css';
 
 const entries = (await getCollection('releases')).sort(
@@ -38,22 +39,71 @@ const items = entries.map((e) => {
 
   return { ...e.data, state, gohanPose };
 });
+
+const site = Astro.site ?? new URL('https://terragohan.com');
+const pageDescription =
+  'The terragohan harvest calendar: a new indie project, tool, or video every two weeks. See the next drop and browse everything we have shipped.';
+const released = items.filter((item) => item.state === 'released');
+
+const orgNode = {
+  '@type': 'Organization',
+  '@id': new URL('/#org', site).href,
+  name: 'terragohan',
+  url: new URL('/', site).href,
+  logo: new URL('/logo-480.png', site).href,
+};
+
+const jsonLd = [
+  orgNode,
+  {
+    '@type': 'WebSite',
+    '@id': new URL('/#website', site).href,
+    name: 'terragohan — harvest calendar',
+    url: new URL('/', site).href,
+    inLanguage: 'en',
+    publisher: { '@id': orgNode['@id'] },
+  },
+  {
+    '@type': 'WebPage',
+    '@id': new URL('/#calendar', site).href,
+    name: 'terragohan — harvest calendar',
+    url: new URL('/', site).href,
+    description: pageDescription,
+    inLanguage: 'en',
+    isPartOf: { '@id': new URL('/#website', site).href },
+    mainEntity: { '@id': new URL('/#releases', site).href },
+  },
+  {
+    '@type': 'ItemList',
+    '@id': new URL('/#releases', site).href,
+    name: 'terragohan harvest releases',
+    url: new URL('/', site).href,
+    numberOfItems: released.length,
+    itemListElement: released.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: item.title,
+      description: item.description,
+      url: item.url,
+    })),
+  },
+];
 ---
 
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta
-      http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self'; base-uri 'none'; object-src 'none'"
-    />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="The terragohan harvest calendar — something new every two weeks." />
+    <Seo
+      title="terragohan — harvest calendar"
+      description={pageDescription}
+      path="/"
+      jsonLd={jsonLd}
+    />
     <link rel="icon" type="image/svg+xml" href="/logo.svg" />
     <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="alternate" type="application/rss+xml" title="terragohan — harvest" href="/rss.xml" />
-    <title>terragohan — harvest calendar</title>
     <script is:inline src="/scripts/theme.js"></script>
   </head>
   <body>
