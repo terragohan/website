@@ -1,0 +1,73 @@
+---
+import { createHash } from 'node:crypto';
+
+interface Props {
+  title: string;
+  description: string;
+  path: string;
+  image?: string;
+  imageAlt?: string;
+  /** schema.org nodes; wrapped in a @graph with the schema.org context. */
+  jsonLd?: object[];
+  /** Extra CSP directives appended after the defaults (e.g. form-action). */
+  cspExtra?: string;
+}
+
+const {
+  title,
+  description,
+  path,
+  image = '/og-image.png',
+  imageAlt = 'terragohan logo — pixel-art Gohan on a cream background',
+  jsonLd,
+  cspExtra,
+} = Astro.props;
+
+const site = Astro.site ?? new URL('https://terragohan.com');
+const canonical = new URL(path, site).href;
+const imageUrl = new URL(image, site).href;
+
+// The head uses a meta-tag CSP with script-src 'self', so the inline JSON-LD
+// gets an explicit sha256 hash instead of loosening the policy.
+let ldJson = '';
+let scriptSources = "'self'";
+if (jsonLd?.length) {
+  ldJson = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@graph': jsonLd,
+  });
+  const hash = createHash('sha256').update(ldJson).digest('base64');
+  scriptSources += ` 'sha256-${hash}'`;
+}
+
+const csp = [
+  "default-src 'self'",
+  `script-src ${scriptSources}`,
+  "style-src 'self' 'unsafe-inline'",
+  "font-src 'self'",
+  "img-src 'self'",
+  "base-uri 'none'",
+  "object-src 'none'",
+  ...(cspExtra ? [cspExtra] : []),
+].join('; ');
+---
+
+<meta http-equiv="Content-Security-Policy" content={csp} />
+<title>{title}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="terragohan" />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={imageUrl} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content={imageAlt} />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={imageUrl} />
+<meta name="theme-color" content="#f7edd8" />
+{ldJson && <script type="application/ld+json" set:html={ldJson} />}

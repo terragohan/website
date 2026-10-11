@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://terragohan.com/sitemap.xml
